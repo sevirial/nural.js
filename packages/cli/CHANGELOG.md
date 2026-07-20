@@ -1,5 +1,11 @@
 # @nuraljs/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- fix(cli): wrap generated templates in defineProvider for infrastructure lifecycle management
+
 ## 1.0.0
 
 ### Major Changes
