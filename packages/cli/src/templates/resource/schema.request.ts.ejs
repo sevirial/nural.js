@@ -1,0 +1,7 @@
+import { Schema } from "@nuraljs/core";
+
+export const Create<%= className %>DTO = Schema.object({
+  name: Schema.string().min(2).openapi({ example: "New <%= className %>" }),
+});
+
+export const Update<%= className %>DTO = Create<%= className %>DTO.partial();

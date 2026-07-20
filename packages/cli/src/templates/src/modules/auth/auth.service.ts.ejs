@@ -1,40 +1,38 @@
-import type { User } from "./models/user.model";
+import { User } from "./models/user.model";
 import { Schema } from "@nuraljs/core";
 import { AuthResponse } from "./schemas/auth.response";
-import type { RegisterDTO } from "./schemas/auth.request";
 
 // 💡 In a real app, inject Prisma or Mongoose here
 const mockDb = new Map<string, User>();
 
-  export const login = async (email: string, password: string): Promise<Schema.infer<typeof AuthResponse>> => {
-    const user = mockDb.get(email);
-
-    if (!user || user.password !== password) {
+export const login = async (email: string, password: string): Promise<Schema.infer<typeof AuthResponse>> => {
+  const user = mockDb.get(email);
+  
+  if (!user || user.password !== password) {
     throw new Error("Invalid credentials");
-    }
+  }
 
-    return generateTokens(user);
-    };
+  return generateTokens(user);
+};
 
-    export const register = async (data: Schema.infer<typeof RegisterDTO>): Promise<Schema.infer<typeof AuthResponse>>
-        => {
-        if (mockDb.has(data.email)) {
-        throw new Error("User already exists");
-        }
+export const register = async (data: any): Promise<Schema.infer<typeof AuthResponse>> => {
+  if (mockDb.has(data.email)) {
+    throw new Error("User already exists");
+  }
 
-        const user: User = {
-        id: Math.random().toString(36).slice(2),
-        ...data,
-        role: "user",
-        createdAt: new Date(),
-        };
+  const user: User = {
+    id: Math.random().toString(36).slice(2),
+    ...data,
+    role: "user",
+    createdAt: new Date(),
+  };
+  
+  mockDb.set(user.email, user);
+  return generateTokens(user);
+};
 
-        mockDb.set(user.email, user);
-        return generateTokens(user);
-        };
-
-        const generateTokens = (user: User): Schema.infer<typeof AuthResponse> => ({
-          accessToken: `access_${user.id}`,
-          refreshToken: `refresh_${user.id}`,
-          user: { id: user.id, email: user.email, name: user.name, role: user.role }
-          });
+const generateTokens = (user: User) => ({
+  accessToken: `access_${user.id}`,
+  refreshToken: `refresh_${user.id}`,
+  user: { id: user.id, email: user.email, name: user.name, role: user.role }
+});

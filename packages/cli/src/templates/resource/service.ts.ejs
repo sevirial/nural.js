@@ -1,39 +1,36 @@
-import type { Create<%= className %>DTO } from "./dto/create-<%= fileName %>.dto";
-    import type { Update<%= className %>DTO } from "./dto/update-<%= fileName %>.dto";
-        import type { <%= className %> } from "./models/<%= fileName %>.model";
+import { <%= className %> } from "./models/<%= fileName %>.model";
 
-            // 💡 Replace with your database (Prisma/Mongoose)
-            const db = new Map<string, <%=className %>>();
+// 💡 Replace with your database (Prisma/Mongoose)
+const db = new Map<string, <%= className %>>();
 
-              export const findAll = async (): Promise<<%= className %>[]> => {
-                return Array.from(db.values());
-                };
+export const findAll = async () => {
+  return Array.from(db.values());
+};
 
-                export const findOne = async (id: string): Promise<<%= className %> | null> => {
-                  return db.get(id) ?? null;
-                  };
+export const findOne = async (id: string) => {
+  return db.get(id) || null;
+};
 
-                  export const create = async (data: Create<%= className %>DTO): Promise<<%= className %>> => {
-                      const id = Math.random().toString(36).substring(7);
-                      const newItem: <%= className %> = {
-                        id,
-                        ...data,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                        };
-                        db.set(id, newItem);
-                        return newItem;
-                        };
+export const create = async (data: any) => {
+  const id = Math.random().toString(36).substring(7);
+  const newItem: <%= className %> = {
+    id,
+    ...data,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  db.set(id, newItem);
+  return newItem;
+};
 
-                        export const update = async (id: string, data: Update<%= className %>DTO): Promise<<%= className
-                            %> | null> => {
-                            const existing = db.get(id);
-                            if (!existing) return null;
-                            const updated: <%= className %> = { ...existing, ...data, updatedAt: new Date() };
-                              db.set(id, updated);
-                              return updated;
-                              };
+export const update = async (id: string, data: any) => {
+  const existing = db.get(id);
+  if (!existing) return null;
+  const updated = { ...existing, ...data, updatedAt: new Date() };
+  db.set(id, updated);
+  return updated;
+};
 
-                              export const remove = async (id: string): Promise<boolean> => {
-                                return db.delete(id);
-                                };
+export const remove = async (id: string) => {
+  return db.delete(id);
+};

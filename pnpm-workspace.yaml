@@ -1,6 +1,3 @@
 packages:
   - packages/*
-
-overrides:
-  cli: link:../../../AppData/Local/pnpm/global/5/node_modules/@nural/cli
-  nural: link:packages/core
+  - examples/*

@@ -1,20 +1,11 @@
 import { createModule } from "@nuraljs/core";
-import { 
-  get<%= className %>s, 
-  create<%= className %>, 
-  get<%= className %>, 
-  update<%= className %>, 
-  delete<%= className %> 
-} from "./<%= fileName %>.controller";
+import * as <%= className %>Controller from "./<%= fileName %>.controller";
 
 export const <%= camelName %>Module = createModule({
   prefix: "/<%= fileName %>s",
   tags: ["<%= className %>"],
-  routes: [
-    get<%= className %>s, 
-    create<%= className %>, 
-    get<%= className %>, 
-    update<%= className %>, 
-    delete<%= className %>
-  ],
+  // Register every route the controller exports. Importing the module as a
+  // namespace means renaming, adding, or removing a handler needs no edit
+  // here — no hardcoded handler names to drift out of sync (avoids TS2724).
+  routes: Object.values(<%= className %>Controller),
 });

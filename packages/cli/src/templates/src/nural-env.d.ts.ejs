@@ -1,0 +1,13 @@
+// Framework-aware `req` / `res` typing.
+//
+// NuralJS is Fastify-first, so `ctx.req` / `ctx.res` default to Fastify's types.
+// This project uses Express, so this declaration overrides that default — every
+// route handler's `req` / `res` become Express's `Request` / `Response` with no
+// per-handler casts. Generated to match `new Nuraljs({ framework: "express" })`.
+import "@nuraljs/core";
+
+declare module "@nuraljs/core" {
+  interface NuralTypeOptions {
+    framework: "<%= framework %>";
+  }
+}

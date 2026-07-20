@@ -1,37 +1,46 @@
+#!/usr/bin/env node
 import { Command } from "commander";
-import { newCommand } from "./commands/new.command";
-import { generateCommand } from "./commands/generate.command";
-import { addCommand } from "./commands/add.command";
-import { infoCommand } from "./commands/info.command";
-import { devCommand } from "./commands/dev.command";
-import { buildCommand } from "./commands/build.command";
-import { startCommand } from "./commands/start.command";
-import { testCommand } from "./commands/test.command";
-import { docsCommand } from "./commands/docs.command";
-import { routesCommand } from "./commands/routes.command";
-import { consoleCommand } from "./commands/console.command";
-import { cleanCommand } from "./commands/clean.command";
-import { doctorCommand } from "./commands/doctor.command";
-import { completionCommand } from "./commands/completion.command";
-import { updateCommand } from "./commands/update.command";
-import pkg from "../package.json";
+import { newCommand } from "./commands/new.js";
+import { generateCommand } from "./commands/generate.js";
+import { addCommand } from "./commands/add.js";
+import { infoCommand } from "./commands/info.js";
+import { devCommand } from "./commands/dev.js";
+import { buildCommand } from "./commands/build.js";
+import { startCommand } from "./commands/start.js";
+import { testCommand } from "./commands/test.js";
+import { docsCommand } from "./commands/docs.js";
+import { routesCommand } from "./commands/routes.js";
+import { consoleCommand } from "./commands/console.js";
+import { cleanCommand } from "./commands/clean.js";
+import { doctorCommand } from "./commands/doctor.js";
+import { completionCommand } from "./commands/completion.js";
+import { updateCommand } from "./commands/update.js";
+import { tokenInspectCommand } from "./commands/token.js";
+import { createRequire } from "module";
+
+// Read the version from package.json rather than hardcoding it — a literal here
+// silently lies the moment the package is versioned. `dist/index.js` sits one
+// level under the package root, and npm always ships package.json.
+const { version } = createRequire(import.meta.url)("../package.json") as {
+  version: string;
+};
 
 const program = new Command();
 
 program
   .name("nural")
-  .description("The official NuralJS CLI")
-  .version(pkg.version || "0.5.0");
+  .description("Nuraljs CLI - The intelligent framework tool")
+  .version(version);
 
 program
   .command("new <project-name>")
-  .description("Scaffold a new Nural project")
+  .description("Scaffold a new Nuraljs project")
   .action(newCommand);
 
 program
   .command("generate <schematic> [name]")
   .alias("g")
-  .description("Generate a new resource (Module, Controller, Service, Schema)")
+  .description("Generate code (resource, middleware, provider, filter)")
   .action(generateCommand);
 
 program
@@ -41,7 +50,7 @@ program
 
 program
   .command("info")
-  .description("It's incredibly useful when users report bugs \"What version of Nural are you running?\"")
+  .description("Print environment + project diagnostics (handy for bug reports)")
   .action(infoCommand);
 
 program
@@ -72,20 +81,20 @@ program
 
 program
   .command("docs")
-  .description("Generate static OpenAPI specification file")
+  .description("Generate a static OpenAPI specification file")
   .option("-o, --output <file>", "Output file path", "openapi.json")
   .action(docsCommand);
 
 program
   .command("routes")
-  .alias("list") // 'nural list' is also intuitive
+  .alias("list")
   .description("List all registered routes")
   .action(routesCommand);
 
 program
   .command("console")
-  .alias("c") // Shortcut: 'nural c'
-  .alias("tinker") // Laravel developers will love this
+  .alias("c")
+  .alias("tinker")
   .description("Launch an interactive application shell (REPL)")
   .action(consoleCommand);
 
@@ -107,7 +116,20 @@ program
 program
   .command("update")
   .alias("u")
-  .description("Update Nural dependencies to the latest version")
+  .description("Update Nuraljs dependencies to the latest version")
   .action(updateCommand);
+
+const token = program
+  .command("token")
+  .description("Inspect Nuraljs auth tokens (the secure equivalent of jwt.io)");
+
+token
+  .command("inspect <token>")
+  .description("Decode a token's public envelope; decrypt its claims with your key")
+  .option("-s, --secret <secret>", `Signing secret (prefer ${"NURALJS_AUTH_SECRET"} or --key-file)`)
+  .option("-k, --key-file <path>", "Read the signing secret from a file")
+  .option("--redact", "Show claim keys and types but not their values")
+  .option("--json", "Output machine-readable JSON")
+  .action(tokenInspectCommand);
 
 program.parse(process.argv);

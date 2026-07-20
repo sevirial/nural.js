@@ -1,10 +1,10 @@
 import { defineExceptionFilter } from "@nuraljs/core";
 
 export const <%= camelName %>Filter = defineExceptionFilter(async (err, req, res, ctx) => {
-  console.error(`[${ctx.handlerName}] Error:`, err);
+  console.error(`[${(ctx as any).handlerName}] Error:`, err);
 
-  if (err.message === "Unauthorized") {
-    res.status(401).send({
+  if ((err as Error).message === "Unauthorized") {
+    (res as any).status(401).send({
       success: false,
       error: "You shall not pass!",
       timestamp: new Date().toISOString()

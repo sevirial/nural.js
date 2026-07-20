@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -7,19 +5,28 @@ services:
       - "${PORT}:${PORT}"
     env_file:
       - .env
+<% const services = integrations.filter((i) => ['redis', 'prisma-pg', 'mongoose'].includes(i)); -%>
+<% if (services.length) { -%>
     depends_on:
-      <% if (integrations.includes('redis')) { %>- redis<% } %>
-      <% if (integrations.includes('prisma-pg')) { %>- postgres<% } %>
-      <% if (integrations.includes('mongoose')) { %>- mongo<% } %>
+<% if (integrations.includes('redis')) { -%>
+      - redis
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
+      - postgres
+<% } -%>
+<% if (integrations.includes('mongoose')) { -%>
+      - mongo
+<% } -%>
+<% } -%>
+<% if (integrations.includes('redis')) { -%>
 
-  <% if (integrations.includes('redis')) { %>
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
-  <% } %>
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
 
-  <% if (integrations.includes('prisma-pg')) { %>
   postgres:
     image: postgres:15-alpine
     environment:
@@ -28,11 +35,11 @@ services:
       POSTGRES_DB: mydb
     ports:
       - "5432:5432"
-  <% } %>
+<% } -%>
+<% if (integrations.includes('mongoose')) { -%>
 
-  <% if (integrations.includes('mongoose')) { %>
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
-  <% } %>
+<% } -%>

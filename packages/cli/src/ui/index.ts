@@ -1,2 +1,2 @@
-export * from "./cli-logger";
-export * from "./cli-prompts";
+export * from "./cli-logger.js";
+export * from "./cli-prompts.js";

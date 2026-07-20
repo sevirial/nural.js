@@ -1,29 +1,33 @@
-import { Nural } from "@nuraljs/core";
+import { Nuraljs } from "@nuraljs/core";
 import { env } from "./config/env";
-<% if (integrations.includes('ws')) { %>import http from "http";<% } %>
-<% if (integrations.includes('ws')) { %>import { Server } from "socket.io";<% } %>
+<% if (integrations.includes('ws')) { -%>
+import http from "http";
+import { Server } from "socket.io";
+<% } -%>
 import { authModule } from "./modules/auth/auth.module";
 
-export const app = new Nural({
+export const app = new Nuraljs({
   framework: "<%= framework %>",
   docs: true,
   logger: {
     enabled: true,
     showTime: true,
   },
-  <% if (integrations.includes('ws')) { %>cors: { origin: "*" }, // Socket.io needs CORS<% } %>
+<% if (integrations.includes('ws')) { -%>
+  cors: { origin: "*" }, // Socket.io needs CORS
+<% } -%>
 });
 
 // Register Modules
 app.registerModule(authModule);
+<% if (integrations.includes('ws')) { -%>
 
-<% if (integrations.includes('ws')) { %>
 export function attachSockets(server: http.Server) {
   const io = new Server(server, {
     cors: {
       origin: "*",
-      methods: ["GET", "POST"]
-    }
+      methods: ["GET", "POST"],
+    },
   });
 
   io.on("connection", (socket) => {
@@ -35,4 +39,4 @@ export function attachSockets(server: http.Server) {
 
   return io;
 }
-<% } %>
+<% } -%>

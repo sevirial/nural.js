@@ -1,6 +1,6 @@
 import { defineMiddleware } from "@nuraljs/core";
 
-export const <%= camelName %>Middleware = defineMiddleware(async (req, res) => {
+export const <%= camelName %>Middleware = defineMiddleware(async (req) => {
   // 💡 Your Logic Here
   const header = req.headers["x-custom-header"];
 

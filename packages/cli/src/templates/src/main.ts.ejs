@@ -1,19 +1,34 @@
-import { app <% if (integrations.includes('ws')) { %>, attachSockets<% } %> } from "./app";
+import { app<% if (integrations.includes('ws')) { %>, attachSockets<% } %> } from "./app";
 import { env } from "./config/env";
-<% if (integrations.includes('rabbitmq')) { %>import { connectRabbitMQ } from "./providers/rabbitmq";<% } %>
-<% if (integrations.includes('mongoose')) { %>import { connectMongoDB } from "./providers/mongoose";<% } %>
-<% if (integrations.includes('prisma-pg')) { %>import { connectPrisma } from "./providers/prisma";<% } %>
+<% if (integrations.includes('rabbitmq')) { -%>
+import { connectRabbitMQ } from "./providers/rabbitmq";
+<% } -%>
+<% if (integrations.includes('mongoose')) { -%>
+import { connectMongoDB } from "./providers/mongoose";
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
+import { connectPrisma } from "./providers/prisma";
+<% } -%>
 
 async function bootstrap() {
-  <% if (integrations.includes('rabbitmq')) { %>await connectRabbitMQ();<% } %>
-  <% if (integrations.includes('mongoose')) { %>await connectMongoDB();<% } %>
-  <% if (integrations.includes('prisma-pg')) { %>await connectPrisma();<% } %>
-
+<% if (integrations.includes('rabbitmq')) { -%>
+  await connectRabbitMQ();
+<% } -%>
+<% if (integrations.includes('mongoose')) { -%>
+  await connectMongoDB();
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
+  await connectPrisma();
+<% } -%>
+<% if (integrations.includes('ws')) { -%>
   const server = app.start(Number(env.PORT));
-  
-  <% if (integrations.includes('ws')) { %>// Attach Socket.io
+
+  // Attach Socket.io
   attachSockets(server);
-  console.log('🔌 WebSockets enabled');<% } %>
+  console.log("🔌 WebSockets enabled");
+<% } else { -%>
+  app.start(Number(env.PORT));
+<% } -%>
 }
 
 bootstrap();

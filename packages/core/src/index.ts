@@ -1,104 +1,55 @@
 /**
- * Nural
+ * Nuraljs
  * The intelligent, schema-first REST framework for Node.js
  *
  * @packageDocumentation
  */
 
-import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
+import { extendZodWithOpenApi } from "./core/openapi-compat";
 
-// Initialize Zod OpenAPI extension (side effect)
+// Initialize the `.openapi()` authoring shim on Zod's prototype (side effect).
+// Zod 4 native: `.openapi()` now forwards to `.meta()`.
 extendZodWithOpenApi(z);
 
 // Core exports
-export { Nural } from "./nural.application";
-export {
-  createRoute,
-  createBuilder,
-} from "./router/route.factory";
-export {
-  createModule,
-} from "./router/module.factory";
-export {
-  defineMiddleware,
-} from "./pipeline/middleware.types";
-export {
-  defineGuard,
-} from "./pipeline/guard.types";
-export {
-  defineInterceptor,
-} from "./pipeline/interceptor.types";
-export {
-  defineProvider,
-} from "./lifecycle/provider-container";
-export {
-  defineConfig,
-} from "./common/config.service";
-export {
-  type InferContext,
-} from "./pipeline/execution-context.interface";
-export * from "./router/route-storage.types";
-export * from "./common/cron.types";
-export * from "./common/websocket.types";
-
-export { ConfigService } from "./common/config.service";
-export { Logger } from "./common/logger.provider";
-export { LoggerService } from "./common/logger.service";
-export { CronService } from "./common/cron.service";
-export type { LoggerConfig } from "./common/logger.provider";
-export * from "./exceptions/http-exception.class";
+export { Nuraljs } from "./core";
+export { createRoute, createModule, defineMiddleware, createBuilder } from "./core";
+export { defineProvider, defineExceptionFilter } from "./core";
+export type {
+  ProviderConfig,
+  NuraljsProvider,
+  ExceptionFilterHandler,
+  MiddlewareHandler,
+  NuralRequest,
+} from "./core";
+export { Logger } from "./core/logger";
+export type { LoggerConfig } from "./core/logger";
+export * from "./core/exceptions";
 
 // Type exports
 export type {
   HttpMethod,
   HttpStatusCode,
-} from "./common/http.types";
-
-export type {
-  NuralConfig,
+  NuraljsConfig,
   DocsConfig,
-} from "./common/config.types";
-
-export type {
   CorsConfig,
   HelmetConfig,
-} from "./pipeline/middleware/middleware-config";
-
-export type {
   ErrorHandler,
   ErrorHandlerConfig,
   ErrorContext,
-} from "./exceptions/error-handler.provider";
-
-export type {
   RouteConfig,
   RouteContext,
   RouteHandler,
+  InferMiddleware,
   AnyRouteConfig,
-  MergeMiddlewareTypes,
-} from "./router/route-storage.types";
+  NuralTypeOptions,
+  ConfiguredFramework,
+  FrameworkRequest,
+  FrameworkResponse,
+} from "./types";
 
-export type {
-  GuardHandler,
-} from "./pipeline/guard.types";
-
-export type {
-  InterceptorHandler,
-  NextFn,
-} from "./pipeline/interceptor.types";
-
-export type {
-  ProviderConfig,
-  NuralProvider,
-} from "./lifecycle/provider-container";
-
-export type {
-  ExceptionFilterHandler,
-} from "./exceptions/filters/exception-filter";
-
-export { defineExceptionFilter } from "./exceptions/filters/exception-filter";
-
-// Re-export Zod for convenience
-export { z as Schema } from "zod";
-export { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+// Re-export Zod for convenience. `Schema` is the documented alias; `z` is the
+// raw name the examples/consumers author against — both point at the same Zod.
+export { z as Schema, z } from "zod";
+export { extendZodWithOpenApi } from "./core/openapi-compat";
