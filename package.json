@@ -1,20 +1,33 @@
 {
-  "name": "nural-monorepo",
+  "name": "@nuraljs/monorepo",
+  "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "description": "Nural.js — the schema-first, type-safe REST framework for Node.js. Monorepo for @nuraljs/core, @nuraljs/cli, @nuraljs/auth, @nuraljs/testing, and @nuraljs/microservices.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "build": "pnpm -r --parallel --aggregate-output run build",
-    "test": "pnpm -r --parallel --aggregate-output run test",
-    "lint": "pnpm -r --parallel run lint"
+    "build":           "pnpm -r build",
+    "build:core":      "pnpm --filter @nuraljs/core build",
+    "build:auth":      "pnpm --filter @nuraljs/auth build",
+    "build:cli":       "pnpm --filter @nuraljs/cli build",
+    "build:testing":   "pnpm --filter @nuraljs/testing build",
+    "build:microservices": "pnpm --filter @nuraljs/microservices build",
+    "dev":             "pnpm -r dev",
+    "test":            "pnpm -r test",
+    "lint":            "pnpm -r lint",
+    "typecheck":       "pnpm -r exec tsc --noEmit",
+    "format":          "pnpm -r exec prettier --write \"src/**/*.ts\"",
+    "changeset":       "changeset",
+    "version-packages": "changeset version",
+    "release":         "pnpm build && changeset publish",
+    "release:dry-run": "pnpm build && changeset status --verbose"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "turbo": "^1.11.3"
-  },
-  "dependencies": {
-    "cli": "link:../../../AppData/Local/pnpm/global/5/node_modules/@nural/cli",
-    "@nuraljs/core": "link:../../../AppData/Local/pnpm/global/5/node_modules/nural"
+    "@changesets/cli": "^2.27.10",
+    "prettier": "^3.5.3",
+    "typescript": "^5.9.3"
   }
 }

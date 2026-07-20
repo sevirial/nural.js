@@ -1,6 +1,6 @@
 {
   "name": "@nuraljs/core",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "description": "The intelligent, schema-first REST framework for Node.js",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,6 +16,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {
@@ -42,12 +43,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ErrorX407/nural.git"
+    "url": "https://github.com/sevirial/nural.js.git",
+    "directory": "packages/core"
   },
   "bugs": {
-    "url": "https://github.com/ErrorX407/nural/issues"
+    "url": "https://github.com/sevirial/nural.js/issues"
   },
-  "homepage": "https://github.com/ErrorX407/nural#readme",
+  "homepage": "https://nuraljs.org",
   "peerDependencies": {
     "express": "^5.2.1",
     "fastify": "^5.7.4"
@@ -61,26 +63,26 @@
     }
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.4",
-    "cron": "^4.4.0",
-    "dotenv": "^17.3.1",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "fast-json-stringify": "^7.0.1",
     "socket.io": "^4.8.3",
-    "swagger-ui-express": "^5.0.1",
-    "zod": "^3.25.76"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@types/cron": "^2.4.3",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^25.2.1",
-    "@types/swagger-ui-express": "^4.1.8",
     "fastify": "^5.7.4",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=24.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "sideEffects": false
 }

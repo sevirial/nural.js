@@ -1,6 +1,0 @@
-import { Schema } from "@nuraljs/core";
-import { Create<%= className %>DTO } from "./create-<%= fileName %>.dto";
-
-        export const Update<%= className %>DTO = Create<%= className %>DTO.partial();
-
-                export type Update<%= className %>DTO = Schema.infer<typeof Update<%=className %>DTO>;

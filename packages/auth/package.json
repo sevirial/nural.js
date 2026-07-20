@@ -1,0 +1,82 @@
+{
+  "name": "@nuraljs/auth",
+  "version": "0.6.0",
+  "description": "Zero-overhead, schema-first, and purely functional authentication system for NuralJS",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "MIGRATION.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nuraljs",
+    "auth",
+    "authentication",
+    "jwt",
+    "crypto",
+    "chacha20-poly1305",
+    "zod"
+  ],
+  "author": {
+    "name": "Chetan Joshi",
+    "email": "chetanjoshi707@gmail.com",
+    "url": "https://github.com/ErrorX407"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sevirial/nural.js.git",
+    "directory": "packages/auth"
+  },
+  "bugs": {
+    "url": "https://github.com/sevirial/nural.js/issues"
+  },
+  "homepage": "https://nuraljs.org",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "msgpackr": "^1.11.8",
+    "@nuraljs/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.1",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "express": "^5.2.1",
+    "fastify": "^5.7.4",
+    "prettier": "^3.2.5",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18",
+    "zod": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "sideEffects": false
+}

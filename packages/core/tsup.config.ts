@@ -20,7 +20,6 @@ export default defineConfig({
     "zod",
     "inquirer",
     "@asteasolutions/zod-to-openapi",
-    "swagger-ui-express",
   ], // Don't bundle dependencies
   shims: true, // Inject shims for __dirname, require, etc. in ESM
   banner: {

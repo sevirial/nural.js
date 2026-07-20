@@ -1,87 +1,87 @@
 import { createRoute, Schema } from "@nuraljs/core";
 import * as <%= className %>Service from "./<%= fileName %>.service";
-    import { Create<%= className %>DTO, Update<%= className %>DTO } from "./dto";
-        import { <%= className %>Response } from "./schemas";
+import { Create<%= className %>DTO, Update<%= className %>DTO } from "./schemas/<%= fileName %>.request";
+import { <%= className %>Response } from "./schemas/<%= fileName %>.response";
 
-          const services = {
-          <%= camelName %>Service: <%= className %>Service
-              };
+const services = {
+  <%= camelName %>Service: <%= className %>Service
+};
 
-              export const get<%= className %>s = createRoute({
-                method: "GET",
-                path: "/",
-                summary: "Get all <%= camelName %>s",
-                  inject: services,
-                  responses: {
-                  200: Schema.array(<%= className %>Response),
-                    },
-                    handler: async ({ <%= camelName %>Service }) => {
-                      return <%= camelName %>Service.findAll();
-                        },
-                        });
+export const get<%= className %>s = createRoute({
+  method: "GET",
+  path: "/",
+  summary: "Get all <%= camelName %>s",
+  inject: services,
+  responses: {
+    200: Schema.array(<%= className %>Response),
+  },
+  handler: async ({ <%= camelName %>Service }) => {
+    return <%= camelName %>Service.findAll();
+  },
+});
 
-                        export const create<%= className %> = createRoute({
-                          method: "POST",
-                          path: "/",
-                          summary: "Create <%= camelName %>",
-                            inject: services,
-                            request: {
-                            body: Create<%= className %>DTO,
-                              },
-                              responses: {
-                              201: <%= className %>Response,
-                                },
-                                handler: async ({ body, <%= camelName %>Service }) => {
-                                  return <%= camelName %>Service.create(body);
-                                    },
-                                    });
+export const create<%= className %> = createRoute({
+  method: "POST",
+  path: "/",
+  summary: "Create <%= camelName %>",
+  inject: services,
+  request: {
+    body: Create<%= className %>DTO,
+  },
+  responses: {
+    201: <%= className %>Response,
+  },
+  handler: async ({ body, <%= camelName %>Service }) => {
+    return <%= camelName %>Service.create(body);
+  },
+});
 
-                                    export const get<%= className %> = createRoute({
-                                      method: "GET",
-                                      path: "/:id",
-                                      summary: "Get <%= camelName %> by ID",
-                                        inject: services,
-                                        request: {
-                                        params: Schema.object({ id: Schema.string() }),
-                                        },
-                                        responses: {
-                                        200: <%= className %>Response.nullable(),
-                                          },
-                                          handler: async ({ params, <%= camelName %>Service }) => {
-                                            return <%= camelName %>Service.findOne(params.id);
-                                              },
-                                              });
+export const get<%= className %> = createRoute({
+  method: "GET",
+  path: "/:id",
+  summary: "Get <%= camelName %> by ID",
+  inject: services,
+  request: {
+    params: Schema.object({ id: Schema.string() }),
+  },
+  responses: {
+    200: <%= className %>Response.nullable(),
+  },
+  handler: async ({ params, <%= camelName %>Service }) => {
+    return <%= camelName %>Service.findOne(params.id);
+  },
+});
 
-                                              export const update<%= className %> = createRoute({
-                                                method: "PATCH",
-                                                path: "/:id",
-                                                summary: "Update <%= camelName %>",
-                                                  inject: services,
-                                                  request: {
-                                                  params: Schema.object({ id: Schema.string() }),
-                                                  body: Update<%= className %>DTO,
-                                                    },
-                                                    responses: {
-                                                    200: <%= className %>Response.nullable(),
-                                                      },
-                                                      handler: async ({ params, body, <%= camelName %>Service }) => {
-                                                        return <%= camelName %>Service.update(params.id, body);
-                                                          },
-                                                          });
+export const update<%= className %> = createRoute({
+  method: "PATCH",
+  path: "/:id",
+  summary: "Update <%= camelName %>",
+  inject: services,
+  request: {
+    params: Schema.object({ id: Schema.string() }),
+    body: Update<%= className %>DTO,
+  },
+  responses: {
+    200: <%= className %>Response.nullable(),
+  },
+  handler: async ({ params, body, <%= camelName %>Service }) => {
+    return <%= camelName %>Service.update(params.id, body);
+  },
+});
 
-                                                          export const delete<%= className %> = createRoute({
-                                                            method: "DELETE",
-                                                            path: "/:id",
-                                                            summary: "Delete <%= camelName %>",
-                                                              inject: services,
-                                                              request: {
-                                                              params: Schema.object({ id: Schema.string() }),
-                                                              },
-                                                              responses: {
-                                                              200: Schema.object({ success: Schema.boolean() }),
-                                                              },
-                                                              handler: async ({ params, <%= camelName %>Service }) => {
-                                                                await <%= camelName %>Service.remove(params.id);
-                                                                  return { success: true };
-                                                                  },
-                                                                  });
+export const delete<%= className %> = createRoute({
+  method: "DELETE",
+  path: "/:id",
+  summary: "Delete <%= camelName %>",
+  inject: services,
+  request: {
+    params: Schema.object({ id: Schema.string() }),
+  },
+  responses: {
+    200: Schema.object({ success: Schema.boolean() }),
+  },
+  handler: async ({ params, <%= camelName %>Service }) => {
+    await <%= camelName %>Service.remove(params.id);
+    return { success: true };
+  },
+});

@@ -5,12 +5,12 @@ type <%= className %>Client = { isConnected: boolean };
 
 export const <%= camelName %>Provider = defineProvider<<%= className %>Client>({
   name: "<%= className %>",
-  
+
   setup: async () => {
     // 💡 Initialize connection
     // const client = new Client(process.env.<%= className.toUpperCase() %>_URL);
     // await client.connect();
-    
+
     return { isConnected: true };
   },
 

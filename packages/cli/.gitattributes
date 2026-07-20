@@ -1,0 +1,15 @@
+# Templates are shipped verbatim into a user's project, so their line endings are
+# a product decision, not an editor preference. 18 of them were once committed as
+# CRLF, which put a stray `\r` at the end of every generated line — invisible
+# trailing whitespace in every scaffolded file.
+#
+# `eol=lf` forces LF in the working tree on every platform, including Windows, so
+# a contributor's editor cannot reintroduce it. (The generator also normalizes at
+# render time — this keeps the source clean too.)
+*.ejs text eol=lf
+
+# Generated-project sources and configs: same reasoning.
+*.ts    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.md    text eol=lf

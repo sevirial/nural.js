@@ -5,6 +5,4 @@ export const <%= className %>Response = Schema.object({
   name: Schema.string(),
   createdAt: Schema.string().datetime(),
   updatedAt: Schema.string().datetime(),
-  });
-
-  export type <%= className %>Response = Schema.infer<typeof <%=className %>Response>;
+});

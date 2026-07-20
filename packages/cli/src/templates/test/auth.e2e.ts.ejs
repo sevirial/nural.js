@@ -1,74 +1,81 @@
-import { createTestClient } from '@nural/testing';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+<% const hasDb = integrations.some((i) => ['mongoose', 'prisma-pg'].includes(i)); -%>
+import { createTestClient } from '@nuraljs/testing';
+import { <% if (hasDb) { %>afterAll, beforeAll, <% } %>describe, expect, it } from 'vitest';
 import { app } from '../../src/app';
+<% if (integrations.includes('mongoose')) { -%>
+import mongoose from 'mongoose';
+import { connectMongoDB } from '../../src/providers/mongoose';
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
+import { connectPrisma, prisma } from '../../src/providers/prisma';
+<% } -%>
 
-// 🟢 Conditional Imports for Database Integrations
-<% if (integrations.includes('mongoose')) { %>
-  import mongoose from 'mongoose';
-  import { connectMongoDB } from '../../src/providers/mongoose';
-  <% } %>
-    <% if (integrations.includes('prisma-pg')) { %>
-      import { connectPrisma, prisma } from '../../src/providers/prisma';
-      <% } %>
+/**
+ * Enterprise E2E Test Suite for Auth Module
+ * Uses @nuraljs/testing for a unified, framework-agnostic testing experience.
+ */
+describe('Auth Module (E2E)', () => {
+  // 🟢 Initialize the Nuraljs Test Client
+  const client = createTestClient(app);
 
-        /**
-        * Enterprise E2E Test Suite for Auth Module
-        * Uses @nural/testing for a unified, framework-agnostic testing experience.
-        */
-        describe('Auth Module (E2E)', () => {
-        // 🟢 Initialize the Nural Test Client
-        const client = createTestClient(app);
+  const testUser = {
+    email: `test_${Date.now()}@nuraljs.dev`,
+    password: 'securePassword123!',
+    name: 'E2E User'
+  };
+<% if (hasDb) { -%>
 
-        const testUser = {
-        email: `test_${Date.now()}@nural.dev`,
-        password: 'securePassword123!',
-        name: 'E2E User'
-        };
+  beforeAll(async () => {
+    // 🟢 Connect to Databases before tests start
+<% if (integrations.includes('mongoose')) { -%>
+    await connectMongoDB();
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
+    await connectPrisma();
+<% } -%>
+  });
 
-        beforeAll(async () => {
-        // 🟢 Connect to Databases before tests start
-        <% if (integrations.includes('mongoose')) { %>await connectMongoDB();<% } %>
-            <% if (integrations.includes('prisma-pg')) { %>await connectPrisma();<% } %>
-                });
+  afterAll(async () => {
+    // 🟢 Cleanup connections after tests finish
+<% if (integrations.includes('mongoose')) { -%>
+    await mongoose.disconnect();
+<% } -%>
+<% if (integrations.includes('prisma-pg')) { -%>
+    await prisma.$disconnect();
+<% } -%>
+  });
+<% } -%>
 
-                afterAll(async () => {
-                // 🟢 Cleanup connections after tests finish
-                <% if (integrations.includes('mongoose')) { %>await mongoose.disconnect();<% } %>
-                    <% if (integrations.includes('prisma-pg')) { %>await prisma.$disconnect();<% } %>
-                        });
+  it('POST /auth/register should create a new user', async () => {
+    const res = await client.post('/auth/register', testUser);
 
-                        it('POST /auth/register should create a new user', async () => {
-                        const res = await client.post('/auth/register', testUser);
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('accessToken');
+    expect(res.body).toHaveProperty('refreshToken');
 
-                        expect(res.status).toBe(201);
-                        expect(res.body).toHaveProperty('accessToken');
-                        expect(res.body).toHaveProperty('refreshToken');
+    const body = res.body as Record<string, any>;
+    expect(body.user.email).toBe(testUser.email);
+  });
 
-                        const body = res.body as Record<string, unknown>;
-                          const user = body.user as Record<string, unknown>;
-                            expect(user.email).toBe(testUser.email);
-                            });
+  it('POST /auth/login should return valid tokens', async () => {
+    const res = await client.post('/auth/login', {
+      email: testUser.email,
+      password: testUser.password
+    });
 
-                            it('POST /auth/login should return valid tokens', async () => {
-                            const res = await client.post('/auth/login', {
-                            email: testUser.email,
-                            password: testUser.password
-                            });
+    expect(res.status).toBe(200);
+    expect(res.body).toBeDefined();
 
-                            expect(res.status).toBe(200);
-                            expect(res.body).toBeDefined();
+    const body = res.body as Record<string, any>;
 
-                            const body = res.body as Record<string, unknown>;
+    expect(body).toHaveProperty('accessToken');
+    expect(body.accessToken).toBeTypeOf('string');
+    expect(body.user.email).toBe(testUser.email);
+  });
 
-                              expect(body).toHaveProperty('accessToken');
-                              expect(body.accessToken).toBeTypeOf('string');
-                              const user = body.user as Record<string, unknown>;
-                                expect(user.email).toBe(testUser.email);
-                                });
-
-                                it('GET /users/me should be protected (401 without token)', async () => {
-                                // Attempting to access a protected route without setting auth headers
-                                const res = await client.get('/users/me');
-                                expect(res.status).toBe(401);
-                                });
-                                });
+  it('GET /users/me should be protected (401 without token)', async () => {
+    // Attempting to access a protected route without setting auth headers
+    const res = await client.get('/users/me');
+    expect(res.status).toBe(401);
+  });
+});
