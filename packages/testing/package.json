@@ -1,6 +1,6 @@
 {
   "name": "@nuraljs/testing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official test harness for NuralJS apps — drive routes through the real adapter with createTestClient.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

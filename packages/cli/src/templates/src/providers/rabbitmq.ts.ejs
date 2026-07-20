@@ -1,20 +1,23 @@
 import * as amqp from "amqplib";
+import { defineProvider } from "@nuraljs/core";
 import { env } from "../config/env";
 
 let connection: amqp.ChannelModel;
 let channel: amqp.Channel;
 
-export const connectRabbitMQ = async () => {
-  try {
+export const rabbitMqProvider = defineProvider({
+  name: "RabbitMQ",
+  setup: async () => {
     connection = await amqp.connect(env.RABBITMQ_URL);
     channel = await connection.createChannel();
     console.log("🐰 RabbitMQ connected");
     return { connection, channel };
-  } catch (error) {
-    console.error("RabbitMQ connection error:", error);
-    process.exit(1);
+  },
+  teardown: async (instance) => {
+    await instance.channel.close();
+    await instance.connection.close();
   }
-};
+});
 
 export const getChannel = () => {
   if (!channel) {

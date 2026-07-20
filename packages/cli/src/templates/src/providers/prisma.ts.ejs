@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { defineProvider } from "@nuraljs/core";
 import pg from "pg";
 import { env } from "../config/env";
 
@@ -10,12 +11,14 @@ const adapter = new PrismaPg(pool);
 
 export const prisma = new PrismaClient({ adapter });
 
-export const connectPrisma = async () => {
-  try {
+export const prismaProvider = defineProvider({
+  name: "Prisma",
+  setup: async () => {
     await prisma.$connect();
     console.log("🐘 Prisma connected (v7 Adapter)");
-  } catch (error) {
-    console.error("Prisma connection error:", error);
-    process.exit(1);
+    return prisma;
+  },
+  teardown: async (instance) => {
+    await instance.$disconnect();
   }
-};
+});

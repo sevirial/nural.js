@@ -1,5 +1,12 @@
 # @nuraljs/microservices
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [669dd05]
+  - @nuraljs/core@1.0.1
+
 ## 0.6.0
 
 ### Minor Changes

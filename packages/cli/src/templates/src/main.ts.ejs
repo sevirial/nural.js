@@ -1,24 +1,30 @@
 import { app<% if (integrations.includes('ws')) { %>, attachSockets<% } %> } from "./app";
 import { env } from "./config/env";
 <% if (integrations.includes('rabbitmq')) { -%>
-import { connectRabbitMQ } from "./providers/rabbitmq";
+import { rabbitMqProvider } from "./providers/rabbitmq";
 <% } -%>
 <% if (integrations.includes('mongoose')) { -%>
-import { connectMongoDB } from "./providers/mongoose";
+import { mongooseProvider } from "./providers/mongoose";
 <% } -%>
 <% if (integrations.includes('prisma-pg')) { -%>
-import { connectPrisma } from "./providers/prisma";
+import { prismaProvider } from "./providers/prisma";
+<% } -%>
+<% if (integrations.includes('redis')) { -%>
+import { redisProvider } from "./providers/redis";
 <% } -%>
 
 async function bootstrap() {
 <% if (integrations.includes('rabbitmq')) { -%>
-  await connectRabbitMQ();
+  await app.registerProvider(rabbitMqProvider);
 <% } -%>
 <% if (integrations.includes('mongoose')) { -%>
-  await connectMongoDB();
+  await app.registerProvider(mongooseProvider);
 <% } -%>
 <% if (integrations.includes('prisma-pg')) { -%>
-  await connectPrisma();
+  await app.registerProvider(prismaProvider);
+<% } -%>
+<% if (integrations.includes('redis')) { -%>
+  await app.registerProvider(redisProvider);
 <% } -%>
 <% if (integrations.includes('ws')) { -%>
   const server = app.start(Number(env.PORT));
