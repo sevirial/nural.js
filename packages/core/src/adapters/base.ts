@@ -14,9 +14,12 @@ import http from "http";
 
 /**
  * Response type for static routes (docs, spec)
+ *
+ * `js` serves a raw JavaScript asset (the self-hosted Scalar bundle) with an
+ * `application/javascript` content type — same-origin, so no CDN or SRI.
  */
 export interface StaticRouteResponse {
-  type: "json" | "html";
+  type: "json" | "html" | "js";
   data: unknown;
 }
 

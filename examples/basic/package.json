@@ -1,0 +1,23 @@
+{
+  "name": "@nuraljs-examples/basic",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Basic Hello-World example for @nuraljs/core (Express engine).",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "start": "tsx server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@nuraljs/core": "workspace:*",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.0"
+  }
+}

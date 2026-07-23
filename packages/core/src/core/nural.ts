@@ -316,16 +316,26 @@ export class Nuraljs {
    */
   private setupDocs(): void {
     const specPath = `${this.docsConfig.path}/openapi.json`;
+    const scriptPath = `${this.docsConfig.path}/scalar.js`;
 
     this.adapter.registerStaticRoute("get", specPath, async () => {
       return { type: "json", data: this.docsGenerator.generateSpec() };
     });
 
+    // Self-host the Scalar UI bundle same-origin instead of loading it from a
+    // third-party CDN: no external <script>, no SRI hash to drift, and the
+    // standalone build inlines every icon/chunk so the toolbar stays intact.
+    if (this.docsConfig.ui !== "swagger") {
+      this.adapter.registerStaticRoute("get", scriptPath, async () => {
+        return { type: "js", data: this.docsGenerator.getScalarBundle() };
+      });
+    }
+
     this.adapter.registerStaticRoute("get", this.docsConfig.path, async () => {
       const html =
         this.docsConfig.ui === "swagger"
           ? this.docsGenerator.getSwaggerHtml(specPath)
-          : this.docsGenerator.getScalarHtml(specPath);
+          : this.docsGenerator.getScalarHtml(specPath, scriptPath);
 
       return {
         type: "html",

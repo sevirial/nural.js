@@ -1,0 +1,26 @@
+{
+  "name": "@nuraljs-examples/full-api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Full-featured REST API example for @nuraljs/core (Fastify engine + socket.io).",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@nuraljs/core": "workspace:*",
+    "fastify": "^5.7.4",
+    "socket.io": "^4.8.3",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.0"
+  }
+}

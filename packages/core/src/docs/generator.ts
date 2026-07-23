@@ -12,6 +12,9 @@
  * `openapi`/`.meta()` overrides are preserved. Scalar/Swagger HTML is unchanged.
  */
 
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { z } from "zod";
 import { getCompiledSchema } from "../core/schema-compiler";
 import type { AnyRouteConfig } from "../types/route";
@@ -19,6 +22,45 @@ import type { ResolvedDocsConfig } from "../types/config";
 
 /** A JSON Schema object as embedded in the OpenAPI document. */
 type JsonSchema = Record<string, unknown>;
+
+/**
+ * A real CommonJS resolver that walks the consumer's `node_modules` in both the
+ * ESM and CJS bundle (tsup's `shims` provides `import.meta.url` in CJS). Same
+ * idiom as `core/optional-engine.ts` — a bare `require` is stubbed out by
+ * esbuild in the ESM build.
+ */
+const nodeRequire = createRequire(import.meta.url);
+
+/**
+ * The self-hosted Scalar UI bundle, read once from the installed
+ * `@scalar/api-reference` package and cached for the process lifetime.
+ *
+ * We serve this **same-origin** (at `${docsPath}/scalar.js`) instead of the
+ * jsdelivr CDN. That removes the third-party runtime dependency entirely — no
+ * external `<script>`, and therefore no Subresource-Integrity hash to drift out
+ * of sync when Scalar publishes. It also keeps the UI whole: the
+ * `browser/standalone.js` IIFE inlines every code-split chunk, icon and font, so
+ * nothing is lazily fetched cross-origin — the failure mode that made the
+ * settings icon and other controls disappear under a CDN + SRI setup.
+ */
+let scalarBundleCache: string | undefined;
+
+function readScalarBundle(): string {
+  if (scalarBundleCache !== undefined) return scalarBundleCache;
+  try {
+    // `browser/standalone.js` isn't a declared export subpath, so resolve the
+    // package's main entry (`dist/index.js`) and derive the sibling build.
+    const entry = nodeRequire.resolve("@scalar/api-reference");
+    const bundlePath = join(dirname(entry), "browser", "standalone.js");
+    scalarBundleCache = readFileSync(bundlePath, "utf8");
+  } catch {
+    throw new Error(
+      "The Scalar docs UI requires '@scalar/api-reference' to be installed. " +
+        "Install it (`npm install @scalar/api-reference`) or set `docs.ui` to 'swagger'.",
+    );
+  }
+  return scalarBundleCache;
+}
 
 /**
  * Zod 4's `.email()`/`.uuid()`/`.url()`/… emit BOTH a `format` and the concrete
@@ -275,17 +317,19 @@ export class DocumentationGenerator {
   }
 
   /**
-   * Get Scalar API documentation HTML
-   *
-   * The Scalar script is pinned to a specific version and loaded with a
-   * Subresource Integrity (SRI) hash so that any CDN-side tampering is
-   * detected and blocked by the browser.
+   * The self-hosted Scalar bundle JS. Served same-origin at `${docsPath}/scalar.js`
+   * (see `nural.ts:setupDocs`) so `getScalarHtml` can reference it without a CDN.
    */
-  getScalarHtml(specUrl: string): string {
+  getScalarBundle(): string {
+    return readScalarBundle();
+  }
+
+  /**
+   * Get Scalar API documentation HTML. `scriptUrl` points at the same-origin,
+   * self-hosted bundle (default matches the default docs path); no CDN is used.
+   */
+  getScalarHtml(specUrl: string, scriptUrl = "/docs/scalar.js"): string {
     const scalarConfig = JSON.stringify(this.config.scalar || {});
-    // Pinned: @scalar/api-reference@1.25.67
-    const SCALAR_SRC = "https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.25.67/dist/browser/standalone.min.js";
-    const SCALAR_SRI = "sha384-tfGQqpB6aWsF5OlgqoJ/9opwQKZU6VJ1y9Gzn277ZDgRV1ViHDmCrPYa7GrBjJxG";
     return `
       <!doctype html>
       <html>
@@ -300,9 +344,7 @@ export class DocumentationGenerator {
             id="api-reference"
             data-url="${specUrl}"
             data-configuration='${scalarConfig}'
-            src="${SCALAR_SRC}"
-            integrity="${SCALAR_SRI}"
-            crossorigin="anonymous"
+            src="${scriptUrl}"
           ></script>
         </body>
       </html>
@@ -311,35 +353,22 @@ export class DocumentationGenerator {
 
   /**
    * Get Swagger UI HTML
-   *
-   * All CDN assets are pinned to specific versions and loaded with
-   * Subresource Integrity (SRI) hashes so that any CDN-side tampering
-   * is detected and blocked by the browser.
    */
   getSwaggerHtml(specUrl: string): string {
     const title = this.config.openApi.info?.title ?? "Nuraljs API";
     const swaggerOptions = JSON.stringify(this.config.swagger.options || {});
-
-    // Pinned: swagger-ui 4.15.5
-    const SWAGGER_BASE = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5";
-    const SWAGGER_CSS_SRI       = "sha384-J8qHJAHNGogw4AZvlpfgrv8amL76NFTgIWACyfNLuqq02AVOVWKXGh8dcqtv7RFF";
-    const SWAGGER_BUNDLE_SRI    = "sha384-GJoyyEnbeIyINXWDkEzUHpPPCZPcP2KrAg83c6DGAkTPr2tDHQ59DuqMRwAwsJwV";
-    const SWAGGER_STANDALONE_SRI = "sha384-LPIWB4adMa/c1eVa/Jc8ShfB3GG4sxupb/nSFLbjiIhnM78eY2zgZImCSGhpdBJA";
-
-    let themeUrl = `${SWAGGER_BASE}/swagger-ui.min.css`;
-    let themeSri = SWAGGER_CSS_SRI;
+    let themeUrl =
+      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css";
 
     if (this.config.swagger.theme === "outline") {
-      // outline theme uses a different version; no pinned SRI available — omit integrity
-      themeUrl = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css";
-      themeSri = "";
+      themeUrl =
+        "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css";
     } else if (this.config.swagger.theme === "no-theme") {
       themeUrl = "";
-      themeSri = "";
     }
 
     const theme = themeUrl
-      ? `<link rel="stylesheet" href="${themeUrl}"${themeSri ? ` integrity="${themeSri}" crossorigin="anonymous"` : ""} />`
+      ? `<link rel="stylesheet" href="${themeUrl}" />`
       : "";
 
     return `
@@ -357,8 +386,8 @@ export class DocumentationGenerator {
       </head>
       <body>
         <div id="swagger-ui"></div>
-        <script src="${SWAGGER_BASE}/swagger-ui-bundle.js" integrity="${SWAGGER_BUNDLE_SRI}" crossorigin="anonymous"></script>
-        <script src="${SWAGGER_BASE}/swagger-ui-standalone-preset.js" integrity="${SWAGGER_STANDALONE_SRI}" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js"></script>
         <script>
         window.onload = function() {
           const ui = SwaggerUIBundle({

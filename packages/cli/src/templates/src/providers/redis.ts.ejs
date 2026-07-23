@@ -1,17 +1,7 @@
 import Redis from 'ioredis';
-import { defineProvider } from '@nuraljs/core';
 import { env } from '../config/env';
 
-export const redis = new Redis(env.REDIS_URL, { lazyConnect: true });
+export const redis = new Redis(env.REDIS_URL);
 
-export const redisProvider = defineProvider({
-  name: 'Redis',
-  setup: async () => {
-    await redis.connect();
-    console.log('📦 Redis connected');
-    return redis;
-  },
-  teardown: async (instance) => {
-    instance.disconnect();
-  }
-});
+redis.on('connect', () => console.log('📦 Redis connected'));
+redis.on('error', (err) => console.error('Redis Error', err));

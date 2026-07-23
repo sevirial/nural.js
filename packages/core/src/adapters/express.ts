@@ -174,6 +174,9 @@ export class ExpressAdapter implements ServerAdapter {
         if (result.type === "html") {
           res.set("Content-Type", "text/html");
           res.send(result.data);
+        } else if (result.type === "js") {
+          res.set("Content-Type", "application/javascript; charset=utf-8");
+          res.send(result.data);
         } else {
           res.json(result.data);
         }
