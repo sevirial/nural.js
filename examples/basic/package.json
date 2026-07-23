@@ -1,6 +1,6 @@
 {
   "name": "@nuraljs-examples/basic",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "description": "Basic Hello-World example for @nuraljs/core (Express engine).",

@@ -1,5 +1,11 @@
 # @nuraljs/cli
 
+## 1.2.0
+
+### Minor Changes
+
+- Self-host Scalar UI to completely remove CDN dependencies and fix SRI hash brittleness. Add Nuraljs CLI ASCII dev banner and add Fastify support for `js` response types.
+
 ## 1.1.0
 
 ### Minor Changes

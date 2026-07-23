@@ -1,6 +1,6 @@
 {
   "name": "@nuraljs/microservices",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A lightweight, highly extensible RPC and Message Broker microservices module for the Nural.js framework.",
   "type": "module",
   "main": "./dist/index.cjs",

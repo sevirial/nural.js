@@ -1,6 +1,6 @@
 {
   "name": "@nuraljs-examples/full-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "description": "Full-featured REST API example for @nuraljs/core (Fastify engine + socket.io).",
