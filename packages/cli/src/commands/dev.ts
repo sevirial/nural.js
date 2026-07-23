@@ -1,4 +1,4 @@
-import { CliLogger, chalk } from "../ui/index.js";
+import { CliLogger } from "../ui/index.js";
 import { execa } from "execa";
 import fs from "fs-extra";
 import { createRequire } from "module";
@@ -22,21 +22,14 @@ export async function devCommand(options: { watch?: boolean }) {
   }
 
   console.clear();
-  console.log(
-    chalk.bold.hex("#6366f1")(`
- ███╗   ██╗██╗   ██╗██████╗  █████╗ ██╗             ██╗███████╗
- ████╗  ██║██║   ██║██╔══██╗██╔══██╗██║             ██║██╔════╝
- ██╔██╗ ██║██║   ██║██████╔╝███████║██║             ██║███████╗
- ██║╚██╗██║██║   ██║██╔══██╗██╔══██║██║        ██   ██║╚════██║
- ██║ ╚████║╚██████╔╝██║  ██║██║  ██║███████╗   ╚█████╔╝███████║
-   `),
-  );
-  CliLogger.dim(`  v${require("../package.json").version}`);
   CliLogger.success("\n  🚀 Starting Nuraljs Development Server...");
 
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     NURALJS_CLI: "true",
+    // Version is read by the dev-banner preload (below) so the banner header
+    // renders identically on the first boot and on every watch restart.
+    NURALJS_DEV_VERSION: require("../package.json").version,
     FORCE_COLOR: "true", // Ensures child process keeps colors
   };
 
@@ -48,10 +41,15 @@ export async function devCommand(options: { watch?: boolean }) {
 
   CliLogger.dim("  Watching for changes in src/...\n");
 
+  // Preload the banner inside the watched child so `tsx watch` reprints it on
+  // every restart (the parent `nural dev` process runs once and never reloads).
+  // `dev-banner.js` is emitted next to this bundle in `dist/`.
+  const bannerPreload = new URL("./dev-banner.js", import.meta.url).href;
+
   try {
     // 2. Run tsx watch
     // stdio: 'inherit' lets the child process print directly to the console
-    const child = execa("tsx", ["watch", "src/main.ts"], {
+    const child = execa("tsx", ["watch", `--import=${bannerPreload}`, "src/main.ts"], {
       cwd,
       preferLocal: true, // resolve tsx from the project's node_modules/.bin
       stdio: "inherit",

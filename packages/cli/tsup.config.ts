@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: ["src/index.ts", "src/dev-banner.ts"],
   format: ["esm"],
   dts: true,
   clean: true,

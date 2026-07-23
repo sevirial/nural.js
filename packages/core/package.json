@@ -1,6 +1,6 @@
 {
   "name": "@nuraljs/core",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "The intelligent, schema-first REST framework for Node.js",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -63,6 +63,7 @@
     }
   },
   "dependencies": {
+    "@scalar/api-reference": "^1.63.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "fast-json-stringify": "^7.0.1",

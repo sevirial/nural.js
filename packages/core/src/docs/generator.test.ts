@@ -274,11 +274,21 @@ describe("DocumentationGenerator (native OpenAPI)", () => {
   });
 
   describe("HTML output unchanged", () => {
-    it("Scalar HTML embeds the spec URL + Scalar CDN", () => {
+    it("Scalar HTML embeds the spec URL + self-hosted (non-CDN) bundle", () => {
       const g = new DocumentationGenerator(resolveDocsConfig({} as never));
-      const html = g.getScalarHtml("/docs/openapi.json");
+      const html = g.getScalarHtml("/docs/openapi.json", "/docs/scalar.js");
       expect(html).toContain('data-url="/docs/openapi.json"');
-      expect(html).toContain("@scalar/api-reference");
+      expect(html).toContain('src="/docs/scalar.js"');
+      // Self-hosted: no third-party CDN reference.
+      expect(html).not.toContain("cdn.jsdelivr.net");
+    });
+
+    it("getScalarBundle returns the self-contained standalone bundle", () => {
+      const g = new DocumentationGenerator(resolveDocsConfig({} as never));
+      const bundle = g.getScalarBundle();
+      expect(bundle.length).toBeGreaterThan(1000);
+      // The self-hosted IIFE must not reach back out to the CDN at runtime.
+      expect(bundle).not.toContain("cdn.jsdelivr.net");
     });
 
     it("Swagger HTML embeds the spec URL + Swagger bundle", () => {
@@ -313,9 +323,13 @@ describe("DocumentationGenerator (native OpenAPI)", () => {
       type: "json",
       data: g.generateSpec(),
     }));
+    adapter.registerStaticRoute("get", "/docs/scalar.js", async () => ({
+      type: "js",
+      data: g.getScalarBundle(),
+    }));
     adapter.registerStaticRoute("get", "/docs", async () => ({
       type: "html",
-      data: g.getScalarHtml(specPath),
+      data: g.getScalarHtml(specPath, "/docs/scalar.js"),
     }));
 
     const jsonRes = await adapter.app.inject({ method: "GET", url: specPath });
@@ -328,6 +342,16 @@ describe("DocumentationGenerator (native OpenAPI)", () => {
     const htmlRes = await adapter.app.inject({ method: "GET", url: "/docs" });
     expect(htmlRes.statusCode).toBe(200);
     expect(htmlRes.headers["content-type"]).toContain("text/html");
-    expect(htmlRes.body).toContain("@scalar/api-reference");
+    expect(htmlRes.body).toContain('src="/docs/scalar.js"');
+    expect(htmlRes.body).not.toContain("cdn.jsdelivr.net");
+
+    // The self-hosted bundle is served same-origin as JavaScript.
+    const jsRes = await adapter.app.inject({
+      method: "GET",
+      url: "/docs/scalar.js",
+    });
+    expect(jsRes.statusCode).toBe(200);
+    expect(jsRes.headers["content-type"]).toContain("application/javascript");
+    expect(jsRes.body.length).toBeGreaterThan(1000);
   });
 });

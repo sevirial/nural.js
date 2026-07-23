@@ -1,5 +1,12 @@
 # @nuraljs/testing
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @nuraljs/core@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

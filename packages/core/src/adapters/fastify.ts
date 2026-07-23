@@ -212,6 +212,8 @@ export class FastifyAdapter implements ServerAdapter {
         const result = await handler(req);
         if (result.type === "html") {
           reply.type("text/html").send(result.data);
+        } else if (result.type === "js") {
+          reply.type("application/javascript; charset=utf-8").send(result.data);
         } else {
           reply.send(result.data);
         }
