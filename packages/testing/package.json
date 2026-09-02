@@ -52,7 +52,7 @@
     "@nuraljs/core": "workspace:*",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
-    "fastify": "^5.0.0",
+    "fastify": "^5.12.1",
     "@types/node": "^20.0.0",
     "vitest": "^4.0.0",
     "zod": "^4.0.0"
