@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@nuraljs/core": "workspace:*",
-    "fastify": "^5.7.4",
+    "fastify": "^5.12.5",
     "socket.io": "^4.8.3",
     "zod": "^4.0.0"
   },
